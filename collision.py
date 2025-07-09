@@ -1,29 +1,23 @@
 import pygame
 
-def handle_vertical_collision(player, objects, dy):
-    collided_objects = []
+def HandleCollision(player, objects):
+    player.rect.x += player.x_vel
     for obj in objects:
-        if pygame.sprite.collide_mask(player, obj):
-            if dy > 0:
+        if player.rect.colliderect(obj.rect):
+            if player.x_vel > 0:
+                player.rect.right = obj.rect.left
+            elif player.x_vel < 0:
+                player.rect.left = obj.rect.right
+                player.x_vel = 0
+                break
+
+    player.rect.y += player.y_vel
+    for obj in objects:
+        if player.rect.colliderect(obj.rect):
+            if player.y_vel > 0:
                 player.rect.bottom = obj.rect.top
                 player.landed()
-            elif dy < 0:
+            elif player.y_vel < 0:
                 player.rect.top = obj.rect.bottom
                 player.hit_head()
-
-            collided_objects.append(obj)
-
-    return collided_objects
-
-def collide(player, objects, dx):
-    player.move(dx, 0)
-    player.update()
-    collided_object = None
-    for obj in objects:
-        if pygame.sprite.collide_mask(player, obj):
-            collided_object = obj
-            break
-
-    player.move(-dx, 0)
-    player.update()
-    return collided_object
+                break

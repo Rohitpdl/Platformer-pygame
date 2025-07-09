@@ -8,9 +8,8 @@ pygame.display.set_caption("Platformer - Expanded Maze")
 
 from Player import Player
 from level import Block, FloatingBlock, get_background, create_expanded_maze_level
-from collision import handle_vertical_collision, collide
+from collision import HandleCollision
 
-# Constants
 FPS = 60
 PLAYER_VEL = 5
 STARTX = 150
@@ -63,36 +62,17 @@ def main(window):
         player.loop(FPS)
 
         keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:
             player.x_vel = -PLAYER_VEL
             player.direction = "left"
-        elif keys[pygame.K_RIGHT]:
+        elif keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             player.x_vel = PLAYER_VEL
             player.direction = "right"
         else:
             player.x_vel = 0
 
-        player.rect.x += player.x_vel
-        for obj in objects:
-            if player.rect.colliderect(obj.rect):
-                if player.x_vel > 0:
-                    player.rect.right = obj.rect.left
-                elif player.x_vel < 0:
-                    player.rect.left = obj.rect.right
-                player.x_vel = 0
-                break
-
-        player.rect.y += player.y_vel
-        for obj in objects:
-            if player.rect.colliderect(obj.rect):
-                if player.y_vel > 0:
-                    player.rect.bottom = obj.rect.top
-                    player.landed()
-                elif player.y_vel < 0:
-                    player.rect.top = obj.rect.bottom
-                    player.hit_head()
-                break
-
+        HandleCollision(player, objects)
+       
         player.update()
 
         target_offset_x = player.rect.centerx - WIDTH // 2
